@@ -25,8 +25,17 @@ app.get('/livros', async (req,res) => {
 })
 
 app.get('/livros/:codigo', async (req,res) => {
-    const {codigo} = req.params; //desestruturação
-    
+    const {codigo} = req.params; 
+    try{
+        const result = await pool.query('select * from livros where codigo = $1', [codigo])
+        if(result.rows.lengh === 0){
+            return res.status(404).json({error: 'Livro não encontrado'})
+        }
+        res.json(result.rows[0])
+    }catch (err) {
+        console.log(err.message);
+        res.status(500).json({error: 'Esse livro não existe'})
+    }
 })
 
 app.listen(3000, () => {
